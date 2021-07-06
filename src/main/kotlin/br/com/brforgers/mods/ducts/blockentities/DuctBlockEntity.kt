@@ -39,6 +39,7 @@ class DuctBlockEntity(
         instance = this
     }
 
+    private var maxCooldown = 8
     var transferCooldown: Int = -1
 
     var customName: Text? = null
@@ -69,6 +70,9 @@ class DuctBlockEntity(
             val stackCopy = blockEntity.getStack(0).copy()
             val ret = HopperBlockEntity.transfer(blockEntity, outputInv, blockEntity.removeStack(0, 1), outputDir.opposite)
             if (ret.isEmpty) {
+                if (outputInv is DuctBlockEntity) {
+                    (outputInv as DuctBlockEntity).transferCooldown = maxCooldown
+                }
                 outputInv.markDirty()
                 return true
             }
@@ -96,7 +100,7 @@ class DuctBlockEntity(
         blockEntity.transferCooldown = 0
 
         if (attemptInsert(world, pos, state, blockEntity)) {
-            blockEntity.transferCooldown = 8
+            blockEntity.transferCooldown = maxCooldown
             blockEntity.markDirty()
         }
     }
